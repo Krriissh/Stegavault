@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StegaVault – Complete Learning & Implementation Guide</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0d1117; color: #c9d1d9; line-height: 1.8; font-size: 15px; }
+
+  @media print {
+    body { background: #fff; color: #111; font-size: 11pt; }
+    .cover, .chapter-header, pre, code, .callout, .warn-box, .tip-box, .section-tag, .bit-row span, .flow-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    h1,h2,h3,h4 { page-break-after: avoid; }
+    pre { page-break-inside: avoid; }
+  }
+
+  .container { max-width: 920px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+  /* Cover */
+  .cover { background: linear-gradient(135deg,#0d1117,#161b22 50%,#0d1117); border-bottom: 2px solid #30363d; padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden; }
+  .cover::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse 60% 40% at 50% 30%,rgba(88,166,255,0.09),transparent); pointer-events:none; }
+  .cover-tag { display:inline-block; background:rgba(88,166,255,0.1); border:1px solid rgba(88,166,255,0.28); color:#58a6ff; font-size:0.73rem; letter-spacing:.15em; text-transform:uppercase; padding:.3rem 1rem; border-radius:999px; margin-bottom:1.5rem; }
+  .cover h1 { font-size:3.2rem; font-weight:800; color:#f0f6fc; letter-spacing:-.02em; margin-bottom:.4rem; text-shadow:0 0 40px rgba(88,166,255,.3); }
+  .cover-subtitle { font-size:1.1rem; color:#58a6ff; margin-bottom:2rem; font-weight:500; }
+  .cover-meta { display:flex; flex-wrap:wrap; justify-content:center; gap:.8rem; margin-top:2rem; }
+  .cover-pill { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:.45rem 1rem; font-size:.83rem; color:#8b949e; }
+  .cover-pill span { color:#3fb950; font-weight:600; }
+
+  /* TOC */
+  .toc { background:#161b22; border:1px solid #30363d; border-radius:12px; padding:2rem 2.5rem; margin:2.5rem 0; }
+  .toc-title { color:#f0f6fc; font-size:.83rem; letter-spacing:.12em; text-transform:uppercase; font-weight:700; margin-bottom:1.2rem; }
+  .toc ol { padding-left:1.5rem; }
+  .toc li { margin:.32rem 0; }
+  .toc a { color:#58a6ff; text-decoration:none; font-size:.93rem; }
+  .toc a:hover { text-decoration:underline; }
+  .toc-sub { color:#8b949e; font-size:.82rem; padding-left:1.2rem; margin:.15rem 0; list-style:none; }
+
+  /* Chapter header */
+  .chapter-header { background:#161b22; border-left:4px solid #58a6ff; border-radius:0 10px 10px 0; padding:1.5rem 2rem; margin:4rem 0 1.5rem; }
+  .ch-num { font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; color:#58a6ff; margin-bottom:.3rem; }
+  .chapter-header h2 { font-size:1.65rem; color:#f0f6fc; font-weight:800; }
+
+  /* Headings */
+  h3 { font-size:1.18rem; color:#f0f6fc; margin:2.2rem 0 .6rem; font-weight:700; }
+  h4 { font-size:.85rem; color:#c9d1d9; margin:1.5rem 0 .4rem; font-weight:700; text-transform:uppercase; letter-spacing:.07em; }
+  p { margin:.75rem 0; color:#c9d1d9; }
+
+  /* Section tags */
+  .section-tag { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.18rem .55rem; border-radius:4px; margin-bottom:.4rem; }
+  .tag-theory { background:rgba(163,113,247,.14); color:#a371f7; }
+  .tag-code   { background:rgba(63,185,80,.12);  color:#3fb950; }
+  .tag-example{ background:rgba(255,166,38,.12); color:#ffa626; }
+  .tag-warning{ background:rgba(248,81,73,.12);  color:#f85149; }
+  .tag-tip    { background:rgba(88,166,255,.12); color:#58a6ff; }
+
+  /* Code */
+  pre { background:#1a1a2e; border:1px solid #30363d; border-radius:8px; padding:1.25rem 1.5rem; overflow-x:auto; margin:1rem 0; font-size:.81rem; line-height:1.65; }
+  code { font-family:'Cascadia Code','Fira Code','Consolas',monospace; }
+  p code, li code, td code { background:rgba(110,118,129,.14); border:1px solid #30363d; border-radius:4px; padding:.14em .42em; font-size:.84em; color:#e3b341; }
+
+  /* Syntax */
+  .kw  { color:#ff79c6; } .fn  { color:#50fa7b; } .str { color:#f1fa8c; }
+  .cmt { color:#6272a4; font-style:italic; } .num { color:#bd93f9; }
+  .type{ color:#8be9fd; } .op  { color:#ff79c6; }
+
+  /* Callouts */
+  .callout { background:rgba(88,166,255,.07); border:1px solid rgba(88,166,255,.22); border-left:3px solid #58a6ff; border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin:1.2rem 0; }
+  .callout strong { color:#58a6ff; }
+  .warn-box { background:rgba(248,81,73,.07); border:1px solid rgba(248,81,73,.22); border-left:3px solid #f85149; border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin:1.2rem 0; }
+  .warn-box strong { color:#f85149; }
+  .tip-box { background:rgba(63,185,80,.07); border:1px solid rgba(63,185,80,.22); border-left:3px solid #3fb950; border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin:1.2rem 0; }
+  .tip-box strong { color:#3fb950; }
+  .purple-box { background:rgba(163,113,247,.07); border:1px solid rgba(163,113,247,.22); border-left:3px solid #a371f7; border-radius:0 8px 8px 0; padding:1rem 1.25rem; margin:1.2rem 0; }
+  .purple-box strong { color:#a371f7; }
+
+  /* Tables */
+  table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:.89rem; }
+  th { background:#161b22; color:#f0f6fc; padding:.6rem 1rem; text-align:left; border:1px solid #30363d; font-weight:700; font-size:.78rem; letter-spacing:.05em; text-transform:uppercase; }
+  td { padding:.55rem 1rem; border:1px solid #21262d; color:#c9d1d9; vertical-align:top; }
+  tr:nth-child(even) td { background:rgba(255,255,255,.018); }
+
+  /* Bit visuals */
+  .bit-row { display:flex; gap:2px; font-family:monospace; font-size:.9rem; align-items:center; flex-wrap:wrap; }
+  .bit-row span { display:inline-block; width:22px; height:24px; line-height:24px; text-align:center; border-radius:3px; }
+  .b0 { background:#1e1e2e; color:#8b949e; border:1px solid #30363d; }
+  .b1 { background:#0d2818; color:#3fb950; border:1px solid #3fb950; font-weight:bold; }
+  .bx { background:#2d1313; color:#f85149; border:1px solid #f85149; font-weight:bold; }
+  .bh { background:#1a1a00; color:#e3b341; border:1px solid #e3b341; font-weight:bold; }
+  .byte-label { font-size:.72rem; color:#8b949e; margin:0 .3rem 0 .6rem; }
+
+  /* Flow diagram */
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:.5rem; margin:1rem 0; padding:1rem 1.25rem; background:#161b22; border:1px solid #30363d; border-radius:8px; }
+  .flow-box { background:#0d1117; border:1px solid #58a6ff; border-radius:6px; padding:.38rem .85rem; font-size:.83rem; color:#58a6ff; font-weight:600; }
+  .flow-arrow { color:#30363d; font-size:1.2rem; }
+
+  /* Lists */
+  ul, ol { padding-left:1.5rem; margin:.6rem 0; }
+  li { margin:.35rem 0; }
+
+  /* HR */
+  hr { border:none; border-top:1px solid #21262d; margin:2.2rem 0; }
+
+  /* Interview Q */
+  .iq { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:1.1rem 1.3rem; margin:.9rem 0; }
+  .iq .q { color:#e3b341; font-weight:700; font-size:.9rem; margin-bottom:.55rem; }
+  .iq .a { color:#c9d1d9; font-size:.9rem; line-height:1.75; }
+
+  /* Divider label */
+  .divider-label { display:flex; align-items:center; gap:1rem; margin:2.5rem 0 1rem; }
+  .divider-label span { white-space:nowrap; font-size:.76rem; letter-spacing:.12em; text-transform:uppercase; color:#58a6ff; font-weight:700; }
+  .divider-label::before, .divider-label::after { content:''; flex:1; height:1px; background:#21262d; }
+
+  /* Step boxes */
+  .step-box { display:flex; gap:1rem; margin:.8rem 0; padding:1rem 1.2rem; background:#161b22; border:1px solid #30363d; border-radius:8px; }
+  .step-num { flex-shrink:0; width:28px; height:28px; background:#58a6ff; color:#0d1117; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; }
+  .step-content { flex:1; }
+  .step-content strong { color:#f0f6fc; display:block; margin-bottom:.3rem; }
+
+  /* Byte layout visual */
+  .byte-layout { display:flex; gap:0; font-family:monospace; font-size:.78rem; margin:1rem 0; overflow-x:auto; }
+  .byte-cell { border:1px solid #30363d; padding:.4rem .6rem; text-align:center; min-width:60px; }
+  .byte-cell .label { font-size:.65rem; color:#8b949e; display:block; margin-bottom:.2rem; }
+  .byte-cell .val { color:#58a6ff; font-weight:700; }
+  .bc-len  { background:rgba(163,113,247,.12); border-color:#a371f7; }
+  .bc-iv   { background:rgba(255,166,38,.1);   border-color:#ffa626; }
+  .bc-ct   { background:rgba(63,185,80,.1);    border-color:#3fb950; }
+  .bc-tag  { background:rgba(248,81,73,.1);    border-color:#f85149; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="container">
+    <div class="cover-tag">Complete Learning &amp; Implementation Guide — Extended Edition</div>
+    <h1>StegaVault</h1>
+    <div class="cover-subtitle">Cryptography + Steganography — From Zero to Expert</div>
+    <p style="color:#8b949e;max-width:600px;margin:0 auto 1rem;">Built around your <em>exact</em> source code. Every concept connected to a real function. Every decision explained with its reasoning. After reading this you can rebuild the entire system and explain it at any depth.</p>
+    <div class="cover-meta">
+      <div class="cover-pill">Stack: <span>React 18 + Vite 5</span></div>
+      <div class="cover-pill">Crypto: <span>Web Crypto API</span></div>
+      <div class="cover-pill">Cipher: <span>AES-256-GCM</span></div>
+      <div class="cover-pill">KDF: <span>PBKDF2 + HKDF</span></div>
+      <div class="cover-pill">Stego: <span>Randomized LSB</span></div>
+      <div class="cover-pill">PRNG: <span>Mulberry32</span></div>
+      <div class="cover-pill">Shuffle: <span>Fisher-Yates</span></div>
+      <div class="cover-pill">Analysis: <span>Chi² + Laplacian + LSB</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="container">
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <ol>
+    <li><a href="#ch1">Foundations — Bits, Bytes, Images, CIA Triad</a>
+      <ul>
+        <li class="toc-sub"><a href="#ch1-binary">Binary &amp; number systems</a></li>
+        <li class="toc-sub"><a href="#ch1-image">How images store pixels in memory</a></li>
+        <li class="toc-sub"><a href="#ch1-cia">CIA Triad applied to StegaVault</a></li>
+      </ul>
+    </li>
+    <li><a href="#ch2">Cryptography Deep Dive</a>
+      <ul>
+        <li class="toc-sub"><a href="#ch2-aes">AES internals: rounds, S-box, MixColumns</a></li>
+        <li class="toc-sub"><a href="#ch2-gcm">GCM mode: CTR encryption + GHASH authentication</a></li>
+        <li class="toc-sub"><a href="#ch2-iv">IV/nonce: why random, why 12 bytes</a></li>
+        <li class="toc-sub"><a href="#ch2-pbkdf2">PBKDF2 deep dive with iteration math</a></li>
+        <li class="toc-sub"><a href="#ch2-hkdf">HKDF and the master key system</a></li>
+        <li class="toc-sub"><a href="#ch2-webcrypto">Web Crypto API architecture</a></li>
+        <li class="toc-sub"><a href="#ch2-code">Your code annotated line-by-line</a></li>
+      </ul>
+    </li>
+    <li><a href="#ch3">Steganography Deep Dive</a>
+      <ul>
+        <li class="toc-sub"><a href="#ch3-lsb">LSB theory with full binary trace</a></li>
+        <li class="toc-sub"><a href="#ch3-prng">Mulberry32 PRNG — every operation explained</a></li>
+        <li class="toc-sub"><a href="#ch3-seed">Seed derivation from key bytes</a></li>
+        <li class="toc-sub"><a href="#ch3-fy">Fisher-Yates: proof of uniformity</a></li>
+        <li class="toc-sub"><a href="#ch3-embed">Embed format &amp; bit-writing loop in full</a></li>
+        <li class="toc-sub"><a href="#ch3-extract">Extraction: length header &amp; payload reconstruction</a></li>
+      </ul>
+    </li>
+    <li><a href="#ch4">End-to-End System Walkthrough</a></li>
+    <li><a href="#ch5">Codebase Breakdown — Every File</a></li>
+    <li><a href="#ch6">Deep Technical Understanding</a>
+      <ul>
+        <li class="toc-sub"><a href="#ch6-bitmask">Bit manipulation patterns in detail</a></li>
+        <li class="toc-sub"><a href="#ch6-canvas">Canvas API pipeline &amp; memory model</a></li>
+        <li class="toc-sub"><a href="#ch6-typedarrays">JavaScript typed arrays internals</a></li>
+        <li class="toc-sub"><a href="#ch6-capacity">Capacity math worked examples</a></li>
+        <li class="toc-sub"><a href="#ch6-progress">Progress callback &amp; UI yielding</a></li>
+      </ul>
+    </li>
+    <li><a href="#ch7">Steganalysis — How Detection Works</a>
+      <ul>
+        <li class="toc-sub"><a href="#ch7-chi">Chi-square attack in depth</a></li>
+        <li class="toc-sub"><a href="#ch7-hist">LSB uniformity analysis</a></li>
+        <li class="toc-sub"><a href="#ch7-noise">Laplacian noise analysis</a></li>
+        <li class="toc-sub"><a href="#ch7-heat">Heatmap generation &amp; rendering</a></li>
+        <li class="toc-sub"><a href="#ch7-limits">Why your randomized LSB defeats classical tests</a></li>
+      </ul>
+    </li>
+    <li><a href="#ch8">Security Analysis</a></li>
+    <li><a href="#ch9">Improvements</a></li>
+    <li><a href="#ch10">Rebuild From Scratch</a></li>
+    <li><a href="#ch11">Interview Preparation — 20+ Q&amp;As</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════ CH 1 ═══════════════════════════════════════ -->
+<div class="chapter-header" id="ch1">
+  <div class="ch-num">Chapter 1</div>
+  <h2>Foundations — Bits, Bytes, Images &amp; the CIA Triad</h2>
+</div>
+
+<h3 id="ch1-binary">1.1 Binary — The Language Computers Actually Speak</h3>
+<p>Every piece of data on a computer — text, images, audio, video, executable programs — is ultimately stored as a sequence of <strong>binary digits (bits)</strong>: either 0 or 1. There is no integer 3, no letter 'A', no colour red at the hardware level — only patterns of 0s and 1s that software agrees to interpret as these concepts.</p>
+
+<p><strong>Why binary?</strong> Because transistors — the building blocks of all modern chips — have two stable electrical states: conducting (1) and not-conducting (0). Building reliable hardware with more than two states is exponentially harder.</p>
+
+<h4>Number systems side-by-side</h4>
+<table>
+  <tr><th>System</th><th>Base</th><th>Digits Used</th><th>Example: 182</th><th>Where you see it</th></tr>
+  <tr><td>Decimal</td><td>10</td><td>0–9</td><td><code>182</code></td><td>Human math</td></tr>
+  <tr><td>Binary</td><td>2</td><td>0,1</td><td><code>10110110</code></td><td>Bit manipulation, flags</td></tr>
+  <tr><td>Hexadecimal</td><td>16</td><td>0–9,A–F</td><td><code>0xB6</code></td><td>Memory addresses, AES keys, colour codes</td></tr>
+  <tr><td>Octal</td><td>8</td><td>0–7</td><td><code>0266</code></td><td>Unix file permissions</td></tr>
+</table>
+
+<p>Your <code>cryptoEngine.js</code> exports AES keys as hexadecimal strings (64 characters = 256 bits). The <code>keyToHex()</code> function converts each byte to a 2-character hex string: <code>b.toString(16).padStart(2, '0')</code>. The <code>padStart</code> is critical — byte value 7 would print as <code>"7"</code> without it, but must be <code>"07"</code> to maintain the 2-chars-per-byte contract.</p>
+
+<h4>How positional value works in binary</h4>
+<p>In decimal, each position is worth 10× the position to its right. In binary, each position is worth 2× the position to its right:</p>
+<pre><code>Bit positions:  7    6    5    4    3    2    1    0
+Values:       128   64   32   16    8    4    2    1
+                                                    ↑ Least Significant Bit (LSB)
+                ↑ Most Significant Bit (MSB)
+
+Example: 10110110
+= 1×128 + 0×64 + 1×32 + 1×16 + 0×8 + 1×4 + 1×2 + 0×1
+= 128 + 32 + 16 + 4 + 2
+= 182 ✓</code></pre>
+
+<p>The <strong>LSB (bit position 0, value 1)</strong> is the weakest bit. Flipping it changes the number by only ±1. For a pixel value like 200, changing it to 201 is invisible to the human eye — this is the entire physical basis of LSB steganography.</p>
+
+<h4>Units of storage</h4>
+<table>
+  <tr><th>Unit</th><th>Size</th><th>Relevance to StegaVault</th></tr>
+  <tr><td>Bit</td><td>1 binary digit</td><td>One payload bit hidden per pixel channel</td></tr>
+  <tr><td>Byte (8 bits)</td><td>Values 0–255</td><td>One pixel channel; one character of ASCII text</td></tr>
+  <tr><td>32 bytes</td><td>256 bits</td><td>AES-256 key size; also one SHA-256 hash output</td></tr>
+  <tr><td>12 bytes</td><td>96 bits</td><td>AES-GCM IV size (GCM optimal nonce length)</td></tr>
+  <tr><td>16 bytes</td><td>128 bits</td><td>AES-GCM authentication tag size</td></tr>
+  <tr><td>4 bytes</td><td>32 bits</td><td>Length header in your embed format; also Uint32</td></tr>
+</table>
+
+<h3 id="ch1-image">1.2 How Images Store Pixel Data in Memory</h3>
+<p>A digital image is a rectangular grid of <strong>pixels</strong>. Each pixel stores its colour using three independent intensity values: Red, Green, Blue — the RGB model. Each channel is one byte (0 = no intensity, 255 = full intensity). Mixing them creates any of 16,777,216 possible colours.</p>
+
+<h4>The RGBA memory layout</h4>
+<p>The browser's <code>Canvas 2D API</code> stores image data as a flat, one-dimensional <code>Uint8ClampedArray</code> in RGBA order. For an image with width W and height H:</p>
+<pre><code>Total bytes = W × H × 4
+
+Memory layout:
+Index:  0   1   2   3   4   5   6   7   8   9  10  11 ...
+Value: [R0  G0  B0  A0  R1  G1  B1  A1  R2  G2  B2  A2 ...]
+        ↑─── pixel 0 ───↑   ↑─── pixel 1 ───↑   ↑── pixel 2 ──↑
+
+Pixel index p → byte offset = p × 4
+  data[p*4 + 0] = Red channel
+  data[p*4 + 1] = Green channel
+  data[p*4 + 2] = Blue channel
+  data[p*4 + 3] = Alpha channel (255 = fully opaque)</code></pre>
+
+<p>This is exactly why <code>stegoEngine.js</code> computes <code>const byteOffset = pixelIdx * 4</code>, then accesses <code>newData[byteOffset + channelIndex]</code> where <code>channelIndex</code> is 0 (R), 1 (G), or 2 (B). The Alpha channel (index 3) is <strong>never touched</strong> — modifying alpha would make the image semi-transparent in a visible, suspicious pattern.</p>
+
+<h4>Why a 1920×1080 image gives ~759KB of hiding capacity</h4>
+<pre><code>1920 × 1080 = 2,073,600 pixels
+× 3 channels used (R, G, B) = 6,220,800 bit slots
+÷ 8 bits per byte            = 777,600 bytes
+− 4 bytes for length header  = 777,596 bytes ≈ 759 KB</code></pre>
+
+<p>For a 5-megapixel photo: 5,000,000 × 3 ÷ 8 = ~1.8 MB of hiding capacity. A 300-word essay is roughly 2KB — you could hide thousands of essays in one photo.</p>
+
+<h4>Why JPEG destroys LSBs (and why StegaVault always outputs PNG)</h4>
+<p>JPEG uses a lossy compression algorithm called Discrete Cosine Transform (DCT). It divides the image into 8×8 blocks, transforms each block into frequency components, then <em>discards</em> fine detail below a quality threshold. A pixel that was value 200 might become 199 or 201 after JPEG round-trip. Since you stored your secret in the LSB, that ±1 change corrupts one bit of your payload every few pixels — total destruction of the hidden data. PNG uses DEFLATE compression, which is lossless — bit-perfect round-trip is guaranteed.</p>
+
+<h3 id="ch1-cia">1.3 The CIA Triad — and How StegaVault Provides Each Property</h3>
+
+<table>
+  <tr><th>Property</th><th>Question It Answers</th><th>How StegaVault Provides It</th></tr>
+  <tr><td><strong>Confidentiality</strong></td><td>Can only authorised parties read it?</td><td>AES-256-GCM encryption makes ciphertext meaningless without the correct key. Even extracting the pixel LSBs gives you encrypted data you cannot read.</td></tr>
+  <tr><td><strong>Integrity</strong></td><td>Was the data modified in transit?</td><td>GCM's 128-bit authentication tag. If even one pixel is edited after embedding, the auth tag fails during decryption and an error is thrown — no silent corruption.</td></tr>
+  <tr><td><strong>Availability</strong></td><td>Can authorised users access it when needed?</td><td>Client-side only — no server to go down. Output is a standard PNG file that works in any browser, viewer, or OS.</td></tr>
+</table>
+
+<p>Beyond the classic triad, StegaVault adds a fourth property specific to steganography:</p>
+<div class="purple-box"><strong>Undetectability (Imperceptibility):</strong> The existence of the hidden data should be undetectable to a passive observer. Achieved by: (a) randomizing pixel selection order so sequential-analysis tools fail, and (b) modifying only the LSB (1-unit colour change) which is below the human visual threshold.</div>
+
+<!-- ═══════════════════════════════════════ CH 2 ═══════════════════════════════════════ -->
+<div class="chapter-header" id="ch2">
+  <div class="ch-num">Chapter 2</div>
+  <h2>Cryptography Deep Dive</h2>
+</div>
+
+<h3>2.0 Encryption Fundamentals</h3>
+
+<table>
+  <tr><th>Term</th><th>Definition</th><th>In StegaVault</th></tr>
+  <tr><td>Plaintext</td><td>The readable original message</td><td>The user's typed message string</td></tr>
+  <tr><td>Ciphertext</td><td>The scrambled, unreadable output</td><td>Result of AES-GCM encrypt; embedded in pixels</td></tr>
+  <tr><td>Key</td><td>Secret data that controls the transformation</td><td>256-bit AES key derived from password via PBKDF2</td></tr>
+  <tr><td>Symmetric cipher</td><td>Same key for encrypt and decrypt</td><td>AES — both operations use the same key</td></tr>
+  <tr><td>IV / Nonce</td><td>Random value ensuring unique ciphertext per operation</td><td>12 random bytes generated fresh per encrypt call</td></tr>
+  <tr><td>Authentication tag</td><td>Cryptographic proof data wasn't tampered with</td><td>16 bytes appended to ciphertext by GCM mode</td></tr>
+  <tr><td>KDF</td><td>Key Derivation Function — converts one key form to another</td><td>PBKDF2 (password→key), HKDF (key→per-image key)</td></tr>
+</table>
+
+<h3 id="ch2-aes">2.1 AES Internals — What Happens Inside encrypt()</h3>
+<p>AES (Advanced Encryption Standard) is a <strong>substitution-permutation network (SPN)</strong>. It takes a 128-bit input block (16 bytes) and puts it through a series of mathematical transformations called <strong>rounds</strong>. With AES-256, there are 14 rounds. Each round does 4 operations:</p>
+
+<div class="step-box">
+  <div class="step-num">1</div>
+  <div class="step-content">
+    <strong>SubBytes — Non-linear substitution</strong>
+    Each byte is independently replaced with a value from a fixed 256-entry lookup table called the <strong>S-box</strong> (substitution box). The S-box is constructed from finite field arithmetic in GF(2⁸) followed by an affine transformation. This introduces non-linearity — without it, AES would be just a linear function breakable by Gaussian elimination. The S-box ensures that flipping one input bit affects roughly half the output bits (the avalanche effect).
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">2</div>
+  <div class="step-content">
+    <strong>ShiftRows — Byte permutation</strong>
+    The 16-byte state is arranged as a 4×4 matrix. Each row is cyclically shifted left by a different amount: row 0 by 0, row 1 by 1, row 2 by 2, row 3 by 3 positions. This ensures bytes from different columns get mixed together in subsequent rounds — without ShiftRows, each column would encrypt independently.
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">3</div>
+  <div class="step-content">
+    <strong>MixColumns — Column diffusion</strong>
+    Each column of the 4×4 state matrix is multiplied by a fixed polynomial in GF(2⁸). This operation ensures that each output byte depends on all 4 input bytes of that column. Together with ShiftRows, after 2 rounds every output byte depends on all 16 input bytes — the "wide trail strategy" that guarantees rapid diffusion.
+  </div>
+</div>
+
+<div class="step-box">
+  <div class="step-num">4</div>
+  <div class="step-content">
+    <strong>AddRoundKey — Key mixing</strong>
+    The state is XOR'd with the 128-bit round key (derived from the master key via the key schedule). XOR is its own inverse (A ⊕ K ⊕ K = A), which makes both encryption and decryption use the same structure. The final round omits MixColumns.
+  </div>
+</div>
+
+<div class="callout"><strong>Why you don't implement this yourself:</strong> The Web Crypto API's <code>crypto.subtle.encrypt()</code> executes AES in hardware on modern CPUs (AES-NI instruction set). Hardware AES is ~10× faster than software and runs in constant time — preventing <em>timing side-channel attacks</em> where an attacker measures how long decryption takes for different inputs to deduce the key. Never implement AES in pure JavaScript for production use.</div>
+
+<h3 id="ch2-gcm">2.2 GCM Mode — How Confidentiality and Integrity Combine</h3>
+<p>AES processes exactly 128-bit blocks. GCM (Galois/Counter Mode) is the <strong>mode of operation</strong> that defines how AES encrypts arbitrary-length messages and adds authentication. It has two independent parts running in parallel:</p>
+
+<h4>Part 1: CTR (Counter) Mode Encryption</h4>
+<pre><code>For each 16-byte block i of plaintext:
+  counter_block = IV ‖ counter_i   (IV = 12 bytes, counter = 4 bytes, starts at 1)
+  keystream_i   = AES_encrypt(counter_block, key)
+  ciphertext_i  = plaintext_i XOR keystream_i
+
+The IV ensures counter_block[0] is unique per message.
+AES is only ever called in ENCRYPT direction, even during decryption.</code></pre>
+
+<p>This turns AES (a block cipher) into a stream cipher — each 16-byte block of plaintext is XOR'd with a unique AES-encrypted counter. The key insight: <strong>XOR is reversible</strong>, so decryption is identical to encryption (just XOR again with the same keystream).</p>
+
+<h4>Part 2: GHASH Authentication</h4>
+<pre><code>GHASH computes a polynomial hash over:
+  - The Additional Authenticated Data (AAD) — metadata authenticated but not encrypted
+  - The ciphertext blocks
+  - The lengths of AAD and ciphertext
+
+The hash is computed in GF(2¹²⁸) using a secret hash key H = AES(key, 0¹²⁸).
+Final tag = GHASH output XOR AES(key, IV ‖ 0³²)
+
+If ANY ciphertext bit is modified, GHASH produces a different value.
+The tag won't match → decryption throws immediately.</code></pre>
+
+<div class="warn-box"><strong>Critical GCM Rule — Never Reuse (Key, IV):</strong> If you encrypt two different messages with the same key AND same IV:<br><br>
+<code>C1 = P1 XOR keystream</code><br>
+<code>C2 = P2 XOR keystream</code><br>
+<code>C1 XOR C2 = P1 XOR P2</code><br><br>
+An attacker can XOR the two ciphertexts to get the XOR of the two plaintexts — completely breaking confidentiality. Your code prevents this by generating a <strong>fresh random 12-byte IV</strong> for every single encryption call using <code>crypto.getRandomValues(new Uint8Array(12))</code>. With 96 random bits, the probability of collision is astronomically small even after billions of operations.</div>
+
+<h3 id="ch2-iv">2.3 The IV — Why 12 Bytes, Why Random, Why Stored with Ciphertext</h3>
+
+<p><strong>Why 12 bytes?</strong> RFC 5116 and NIST SP 800-38D define 96-bit (12-byte) nonces as the recommended length for GCM. Longer nonces require an additional GHASH computation to reduce them to 96 bits, wasting performance. Shorter nonces reduce the collision probability budget. 12 bytes is the sweet spot — and it's what the Web Crypto API enforces.</p>
+
+<p><strong>Why random?</strong> Alternatives to random IVs include: sequential counters, timestamps, or message hashes. All have failure modes. Counters require state synchronization — if two processes encrypt simultaneously, they might use the same counter. Timestamps have low resolution. Random IVs require no coordination and have no state — collision probability for 12 random bytes is 1 in 2⁹⁶ ≈ 10²⁸ per key.</p>
+
+<p><strong>Why store it with the ciphertext?</strong> The IV is not secret — it only needs to be <em>unique</em>. The receiver needs it to reproduce the same keystream for decryption. Your embed format stores it as the first 12 bytes of the payload, before the ciphertext. This is the standard approach used by TLS, SSH, and every well-engineered protocol.</p>
+
+<h3 id="ch2-pbkdf2">2.4 PBKDF2 — How a Weak Password Becomes a Strong Key</h3>
+<p>Users choose weak passwords. "hello123" has roughly 40 bits of entropy. AES-256 needs 256 bits of key material. PBKDF2 bridges this gap through three mechanisms:</p>
+
+<h4>Mechanism 1: Key stretching via iteration</h4>
+<pre><code>PBKDF2-SHA256(password, salt, iterations, keyLen):
+
+  PRF = HMAC-SHA256  (produces 32 bytes per call)
+
+  Block₁ = U₁ XOR U₂ XOR U₃ XOR ... XOR U₁₀₀₀₀₀
+  where:
+    U₁ = HMAC(password, salt ‖ blockIndex)
+    U₂ = HMAC(password, U₁)
+    U₃ = HMAC(password, U₂)
+    ...
+    U₁₀₀₀₀₀ = HMAC(password, U₉₉₉₉₉)
+
+Each HMAC call takes ~microseconds on CPU.
+100,000 iterations × ~2μs = ~200ms per key derivation.
+An attacker testing passwords must pay this cost per guess.</code></pre>
+
+<h4>Mechanism 2: Salt prevents rainbow tables</h4>
+<p>A <strong>rainbow table</strong> is a precomputed database mapping password → key for millions of common passwords. Without a salt, an attacker could precompute all of them. The salt (even your fixed <code>APP_SALT</code>) means any rainbow table must be rebuilt specifically for this salt — a one-time cost of trillions of HMAC operations that no attacker bothers with for a small-scale target.</p>
+
+<h4>Mechanism 3: HMAC provides pseudorandomness</h4>
+<p>HMAC-SHA256 ensures the output is computationally indistinguishable from a random 256-bit string. Two slightly different passwords produce completely different keys — there is no "distance" between passwords at the key level.</p>
+
+<h4>Your PBKDF2 code — fully annotated</h4>
+<span class="section-tag tag-code">cryptoEngine.js lines 21–38</span>
+<pre><code><span class="kw">export async function</span> <span class="fn">deriveKeyFromPassword</span>(password) {
+  <span class="cmt">// Guard: empty password would derive a deterministic well-known key.</span>
+  <span class="kw">if</span> (!password || password.length === <span class="num">0</span>)
+    <span class="kw">throw new</span> <span class="type">Error</span>(<span class="str">'Password must not be empty'</span>);
+
+  <span class="cmt">// STEP 1: Import the password as raw bytes into a PBKDF2 key material handle.</span>
+  <span class="cmt">// 'PBKDF2' algorithm = can only be used for key derivation, not encrypt/decrypt.</span>
+  <span class="cmt">// extractable: false = the raw password bytes can never be exported from the API.</span>
+  <span class="cmt">// ['deriveKey'] = the only permitted operation on this handle.</span>
+  <span class="kw">const</span> keyMaterial = <span class="kw">await</span> crypto.subtle.<span class="fn">importKey</span>(
+    <span class="str">'raw'</span>,
+    <span class="kw">new</span> <span class="type">TextEncoder</span>().<span class="fn">encode</span>(password),   <span class="cmt">// UTF-8 bytes of the password string</span>
+    <span class="str">'PBKDF2'</span>,
+    <span class="kw">false</span>,          <span class="cmt">// ← not extractable: password bytes cannot leave the crypto module</span>
+    [<span class="str">'deriveKey'</span>]
+  );
+
+  <span class="cmt">// STEP 2: Run PBKDF2 to produce a 256-bit AES-GCM CryptoKey.</span>
+  <span class="cmt">// salt: APP_SALT = 'StegaVault-v1.0-2024-salt' as UTF-8 bytes.</span>
+  <span class="cmt">// iterations: 100,000 — raises brute-force cost by 5 orders of magnitude vs. no stretching.</span>
+  <span class="cmt">// hash: 'SHA-256' — the underlying PRF is HMAC-SHA256, producing 32-byte blocks.</span>
+  <span class="cmt">// extractable: true — needed so getKeyBytes() can read the key for PRNG seeding.</span>
+  <span class="cmt">// Note: making a key extractable is a security trade-off; in a server context you'd say false.</span>
+  <span class="kw">return</span> crypto.subtle.<span class="fn">deriveKey</span>(
+    {
+      name: <span class="str">'PBKDF2'</span>,
+      salt: APP_SALT,          <span class="cmt">// ← fixed: weakness discussed in Chapter 8</span>
+      iterations: <span class="num">100_000</span>,   <span class="cmt">// ← one hundred thousand HMAC-SHA256 calls</span>
+      hash: <span class="str">'SHA-256'</span>
+    },
+    keyMaterial,
+    { name: <span class="str">'AES-GCM'</span>, length: <span class="num">256</span> },   <span class="cmt">// output: 256-bit AES-GCM key</span>
+    <span class="kw">true</span>,
+    [<span class="str">'encrypt'</span>, <span class="str">'decrypt'</span>]             <span class="cmt">// key is usable for both operations</span>
+  );
+}</code></pre>
+
+<h3 id="ch2-hkdf">2.5 HKDF — Deriving Per-Image Keys from a Master Key</h3>
+<p>HKDF (HMAC-based Key Derivation Function, RFC 5869) is the standard for deriving multiple keys from one master secret. It has two phases:</p>
+
+<pre><code>Phase 1 — Extract:
+  PRK = HMAC(salt, IKM)
+  IKM = input key material (your master AES key bytes)
+  salt = 32 zero bytes (fine when IKM is already high-entropy)
+  PRK = pseudorandom key (same 32 bytes, just "processed")
+
+Phase 2 — Expand:
+  OKM = HMAC(PRK, info ‖ 0x01)
+  info = "stegavault:image:" + imageHash
+  OKM = the final derived key bytes
+
+Two different imageHash values → two completely different OKMs.
+Even if you know OKM₁, you cannot compute OKM₂ without PRK.</code></pre>
+
+<div class="callout"><strong>PBKDF2 vs HKDF — when to use which:</strong><br>
+<strong>PBKDF2</strong> = for low-entropy input (human passwords). Its entire purpose is to slow down brute-force — intentionally expensive.<br>
+<strong>HKDF</strong> = for high-entropy input (already-random key material). Fast by design — you don't need to slow down an attacker who can't brute-force 256 random bits anyway. HKDF's value is key <em>separation</em>: one master key → many independent derived keys, each used for exactly one purpose.</div>
+
+<h3 id="ch2-webcrypto">2.6 Web Crypto API Architecture</h3>
+<p>The <code>window.crypto.subtle</code> API is the browser's built-in cryptographic subsystem, specified by the W3C Web Cryptography API. Understanding its design explains several patterns in your code.</p>
+
+<h4>The CryptoKey object — why you can't just use raw bytes</h4>
+<p>The Web Crypto API wraps key material in opaque <code>CryptoKey</code> objects. You cannot read the raw bytes directly unless you set <code>extractable: true</code> and call <code>exportKey()</code>. This is intentional:</p>
+<ul>
+  <li>Prevents accidental logging of key material (keys won't serialize to JSON)</li>
+  <li>Allows the browser to store keys in hardware security modules (HSM/TPM)</li>
+  <li>Enforces algorithm restrictions — a PBKDF2 key can't be used for AES-GCM and vice versa</li>
+</ul>
+
+<p>Your code sets <code>extractable: true</code> specifically because <code>getKeyBytes()</code> needs to read the raw key bytes to seed the PRNG. This is a deliberate trade-off documented in a comment: <code>// extractable – needed to export bytes for PRNG seed</code>.</p>
+
+<h4>All operations return Promises — why</h4>
+<p>Every <code>crypto.subtle</code> call returns a Promise. This design allows the browser to:</p>
+<ul>
+  <li>Execute crypto operations on a background thread (no UI blocking)</li>
+  <li>Offload to hardware AES acceleration (AES-NI) which may require async scheduling</li>
+  <li>Return errors asynchronously rather than throwing synchronously</li>
+</ul>
+<p>This is why all your crypto functions are <code>async</code> and callers use <code>await</code>.</p>
+
+<h4>The algorithm/usage restriction system</h4>
+<pre><code><span class="cmt">// When you import or derive a key, you declare:</span>
+<span class="cmt">// 1. The algorithm it's FOR: 'PBKDF2', 'HKDF', 'AES-GCM'</span>
+<span class="cmt">// 2. The permitted operations: ['deriveKey'] or ['encrypt','decrypt']</span>
+<span class="cmt">//</span>
+<span class="cmt">// Attempting to use a PBKDF2 key for AES-GCM encryption throws:</span>
+<span class="cmt">// DOMException: The requested operation is not valid for the provided key</span>
+<span class="cmt">//</span>
+<span class="cmt">// This prevents key confusion attacks where the same key is</span>
+<span class="cmt">// accidentally used in two incompatible contexts.</span></code></pre>
+
+<h3 id="ch2-code">2.7 encryptMessage() and decryptMessage() — Complete Annotation</h3>
+
+<h4>Byte size accounting for a 20-character message</h4>
+<pre><code>"Hello StegaVault!" = 18 characters = 18 UTF-8 bytes (all ASCII)
+
+After encryptMessage():
+  iv.length         = 12  (always — random)
+  ciphertext.length = 18 + 16 = 34  (plaintext + 16-byte auth tag)
+
+After buildPackage in embedData():
+  [4 bytes length] = stores value 12 + 34 = 46
+  [12 bytes IV]
+  [34 bytes ciphertext]
+  = 50 bytes total embedded in the image
+
+That 50 bytes requires 50 × 8 = 400 bits
+= 400 ÷ 3 = 134 pixels (R,G,B channels used)
+= 134 pixels out of millions — completely imperceptible</code></pre>
+
+<h4>decryptMessage() — what actually happens on wrong key</h4>
+<pre><code><span class="cmt">// Wrong password → wrong PBKDF2 output → wrong AES key</span>
+<span class="cmt">// Wrong key → CTR mode produces wrong keystream</span>
+<span class="cmt">// Wrong keystream XOR ciphertext → garbage "plaintext"</span>
+<span class="cmt">// But: GHASH is also computed with the wrong key</span>
+<span class="cmt">// → computed tag ≠ stored tag → DOMException thrown before any output</span>
+<span class="cmt">//</span>
+<span class="cmt">// The catch block converts this to a user-friendly message.</span>
+<span class="cmt">// Importantly: no partial decryption is ever returned.</span>
+<span class="cmt">// GCM is "all or nothing" — either full verified plaintext, or error.</span>
+<span class="kw">try</span> {
+  <span class="kw">const</span> plaintextBuffer = <span class="kw">await</span> crypto.subtle.<span class="fn">decrypt</span>( ... );
+  <span class="kw">return new</span> <span class="type">TextDecoder</span>().<span class="fn">decode</span>(plaintextBuffer);
+} <span class="kw">catch</span> {
+  <span class="kw">throw new</span> <span class="type">Error</span>(<span class="str">'Decryption failed – wrong key or data is corrupted / not a stego image'</span>);
+}</code></pre>
+
+<!-- ═══════════════════════════════════════ CH 3 ═══════════════════════════════════════ -->
+<div class="chapter-header" id="ch3">
+  <div class="ch-num">Chapter 3</div>
+  <h2>Steganography Deep Dive — Randomized LSB</h2>
+</div>
+
+<h3>3.0 What Is Steganography?</h3>
+<p>Steganography is the practice of hiding the existence of a message. The word comes from Greek: <em>steganos</em> (στεγανός, "covered") + <em>graphein</em> (γράφειν, "writing"). Unlike cryptography which makes messages unreadable, steganography makes messages invisible.</p>
+
+<table>
+  <tr><th>Property</th><th>Cryptography</th><th>Steganography</th><th>StegaVault (both)</th></tr>
+  <tr><td>Goal</td><td>Hide the meaning</td><td>Hide the existence</td><td>Both</td></tr>
+  <tr><td>Detected?</td><td>Yes — obvious ciphertext</td><td>Ideally no</td><td>Ideally no</td></tr>
+  <tr><td>Readable without key?</td><td>No</td><td>Yes (if found)</td><td>No (encrypted)</td></tr>
+  <tr><td>Analogies</td><td>Lockbox</td><td>Invisible ink</td><td>Invisible ink in a lockbox</td></tr>
+</table>
+
+<h3 id="ch3-lsb">3.1 LSB Steganography — Full Binary Trace</h3>
+<p>Let's embed the letter <strong>'H'</strong> (ASCII 72 = <code>01001000</code>) into the first three pixels of an image. Each pixel provides 3 bit slots (R, G, B channels), so 8 bits need 8 slots (which spans 2 pixels + 2 channels of pixel 3).</p>
+
+<h4>Step 1: The byte we want to hide</h4>
+<div class="bit-row" style="margin:.8rem 0;">
+  <span class="byte-label">Bit 7 (MSB)</span>
+  <span class="b0">0</span><span class="b1">1</span><span class="b0">0</span><span class="b0">0</span><span class="b1">1</span><span class="b0">0</span><span class="b0">0</span><span class="b0">0</span>
+  <span class="byte-label">Bit 0 (LSB)</span>
+  <span style="margin-left:1rem;color:#8b949e;font-size:.85rem;">'H' = ASCII 72 = 0x48</span>
+</div>
+
+<h4>Step 2: The original pixel values (before modification)</h4>
+<pre><code>Pixel 0: R=200 (11001000)  G=150 (10010110)  B= 80 (01010000)
+Pixel 1: R=255 (11111111)  G=100 (01100100)  B=180 (10110100)
+Pixel 2: R= 90 (01011010)  G=220 (11011100)  B=... (not needed)</code></pre>
+
+<h4>Step 3: Extract each bit of 'H' (MSB-first) and write into LSB</h4>
+<pre><code>Bit position 0: embed bit 7 of 'H' = 0
+  Original R0 = 11001000 = 200
+  Clear LSB:   11001000 &amp; 11111110 = 11001000
+  Set bit:     11001000 | 0        = 11001000 = 200   ← unchanged
+
+Bit position 1: embed bit 6 of 'H' = 1
+  Original G0 = 10010110 = 150
+  Clear LSB:   10010110 &amp; 11111110 = 10010110
+  Set bit:     10010110 | 1        = 10010111 = 151   ← +1
+
+Bit position 2: embed bit 5 of 'H' = 0
+  Original B0 = 01010000 = 80
+  Clear LSB:   01010000 &amp; 11111110 = 01010000
+  Set bit:     01010000 | 0        = 01010000 = 80    ← unchanged
+
+Bit position 3: embed bit 4 of 'H' = 0
+  Original R1 = 11111111 = 255
+  Clear LSB:   11111111 &amp; 11111110 = 11111110
+  Set bit:     11111110 | 0        = 11111110 = 254   ← -1
+
+Bit position 4: embed bit 3 of 'H' = 1
+  Original G1 = 01100100 = 100
+  Clear LSB:   01100100 &amp; 11111110 = 01100100
+  Set bit:     01100100 | 1        = 01100101 = 101   ← +1
+
+Bit position 5: embed bit 2 of 'H' = 0
+  Original B1 = 10110100 = 180
+  Clear LSB:   10110100 &amp; 11111110 = 10110100
+  Set bit:     10110100 | 0        = 10110100 = 180   ← unchanged
+
+Bit position 6: embed bit 1 of 'H' = 0
+  Original R2 = 01011010 = 90
+  Clear LSB:   01011010 &amp; 11111110 = 01011010
+  Set bit:     01011010 | 0        = 01011010 = 90    ← unchanged
+
+Bit position 7: embed bit 0 of 'H' (LSB of 'H') = 0
+  Original G2 = 11011100 = 220
+  Clear LSB:   11011100 &amp; 11111110 = 11011100
+  Set bit:     11011100 | 0        = 11011100 = 220   ← unchanged</code></pre>
+
+<h4>Step 4: Result — original vs. modified</h4>
+<table>
+  <tr><th>Channel</th><th>Original</th><th>Modified</th><th>Change</th></tr>
+  <tr><td>Pixel 0 R</td><td>200</td><td>200</td><td>none</td></tr>
+  <tr><td>Pixel 0 G</td><td>150</td><td>151</td><td>+1 (0.4%)</td></tr>
+  <tr><td>Pixel 0 B</td><td>80</td><td>80</td><td>none</td></tr>
+  <tr><td>Pixel 1 R</td><td>255</td><td>254</td><td>-1 (0.4%)</td></tr>
+  <tr><td>Pixel 1 G</td><td>100</td><td>101</td><td>+1 (1.0%)</td></tr>
+  <tr><td>Pixel 1 B</td><td>180</td><td>180</td><td>none</td></tr>
+  <tr><td>Pixel 2 R</td><td>90</td><td>90</td><td>none</td></tr>
+  <tr><td>Pixel 2 G</td><td>220</td><td>220</td><td>none</td></tr>
+</table>
+
+<p>Maximum colour change: ±1 out of 255. Human <strong>just-noticeable difference (JND)</strong> for colour is approximately ±2–4 units — so LSB modification is below the perceptual threshold for any single pixel. Across millions of pixels it remains invisible because the changes are random (not forming any visible pattern).</p>
+
+<h3 id="ch3-prng">3.2 Mulberry32 PRNG — Every Operation Explained</h3>
+<p>Mulberry32 is a <strong>32-bit hash-based PRNG</strong> designed for use in WASM/JS where 64-bit integers are costly. It was created by Tommy Ettinger (2017) and consistently passes BigCrush and PractRand statistical tests.</p>
+
+<pre><code><span class="kw">function</span> <span class="fn">mulberry32</span>(seed) {
+  <span class="kw">let</span> s = seed <span class="op">>>></span> <span class="num">0</span>;
+  <span class="cmt">// '>>> 0' converts to 32-bit UNSIGNED integer.
+  // In JavaScript, all numbers are 64-bit floats by default.
+  // Bitwise operators work on 32-bit signed ints — '>>> 0' re-interprets
+  // as unsigned, preventing negative state values after overflow.</span>
+
+  <span class="kw">return function</span> () {
+    s <span class="op">+=</span> <span class="num">0x6d2b79f5</span>;
+    s = s <span class="op">>>></span> <span class="num">0</span>;
+    <span class="cmt">// Advance state by adding the Weyl sequence constant 0x6D2B79F5.
+    // A Weyl sequence (s += constant) has good equidistribution —
+    // after 2³² steps it visits every 32-bit value exactly once.
+    // The constant must be ODD to ensure full period.
+    // 0x6D2B79F5 = 1831565813 (odd ✓).
+    // '>>> 0' re-clamps to 32-bit after addition overflow.</span>
+
+    <span class="kw">let</span> t = Math.<span class="fn">imul</span>(s <span class="op">^</span> (s <span class="op">>>></span> <span class="num">15</span>), s <span class="op">|</span> <span class="num">1</span>);
+    <span class="cmt">// s ^ (s >>> 15): XOR s with itself shifted right 15 bits.
+    // This "folds" the upper bits into the lower bits — bit diffusion.
+    // s | 1: ensures the multiplier is odd (prevents even multipliers
+    //        which would lose the MSB and reduce effective state size).
+    // Math.imul: 32-bit integer multiply — avoids IEEE 754 float rounding
+    //            that would corrupt results for large numbers.</span>
+
+    t <span class="op">^=</span> t <span class="op">+</span> Math.<span class="fn">imul</span>(t <span class="op">^</span> (t <span class="op">>>></span> <span class="num">7</span>), t <span class="op">|</span> <span class="num">61</span>);
+    <span class="cmt">// Second mixing stage: more xorshift + multiply.
+    // '>>> 7' and '| 61' are chosen to maximize bit avalanche.
+    // The 't ^= t + ...' pattern ensures the final value depends
+    // on ALL bits of the intermediate t.</span>
+
+    <span class="kw">return</span> ((t <span class="op">^</span> (t <span class="op">>>></span> <span class="num">14</span>)) <span class="op">>>></span> <span class="num">0</span>) / <span class="num">0x100000000</span>;
+    <span class="cmt">// Final xorshift for last bit diffusion.
+    // '>>> 0' forces unsigned 32-bit.
+    // ÷ 0x100000000 (= 2³² = 4294967296) maps [0, 2³²-1] → [0, 1)
+    // This is the standard way to get a float in [0,1) from uint32.</span>
+  };
+}</code></pre>
+
+<div class="callout"><strong>Why not Math.random()?</strong> Three problems: (1) <code>Math.random()</code> cannot be seeded — you cannot reproduce a specific sequence. Different calls in different contexts will give different pixel orders. (2) The algorithm is implementation-defined — Chrome (V8), Firefox (SpiderMonkey), and Safari (JavaScriptCore) may use different algorithms, so the same "seed" would give different shuffles across browsers. (3) There is no spec guarantee about statistical quality. Mulberry32 solves all three: it's deterministic, portable, and statistically validated.</div>
+
+<h3 id="ch3-seed">3.3 Seed Derivation from Key Bytes</h3>
+<pre><code><span class="kw">function</span> <span class="fn">seedFromKey</span>(keyBytes) {
+  <span class="kw">let</span> seed = <span class="num">0</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < Math.<span class="fn">min</span>(<span class="num">8</span>, keyBytes.length); i++) {
+    seed = (seed <span class="op">*</span> <span class="num">31</span> + keyBytes[i]) <span class="op">>>></span> <span class="num">0</span>;
+  }
+  <span class="kw">return</span> seed;
+}</code></pre>
+
+<p>This is a <strong>polynomial rolling hash</strong>: <code>seed = seed × 31 + byte[i]</code>, applied 8 times. The multiplier 31 is chosen because:</p>
+<ul>
+  <li>It is prime — avoids common-factor collisions</li>
+  <li>It is a Mersenne prime (2⁵ − 1) — multiplication by 31 can be optimized as <code>(x &lt;&lt; 5) − x</code></li>
+  <li>It is widely used (Java's String.hashCode() uses it)</li>
+</ul>
+
+<p><strong>Worked example</strong> — first 8 bytes of an AES key: <code>[0xA3, 0x5F, 0x9C, 0x12, 0x8B, 0xE4, 0x71, 0x3D]</code></p>
+<pre><code>i=0: seed = (0 × 31 + 0xA3) >>> 0 = 163
+i=1: seed = (163 × 31 + 0x5F) >>> 0 = 5152
+i=2: seed = (5152 × 31 + 0x9C) >>> 0 = 159868
+i=3: seed = (159868 × 31 + 0x12) >>> 0 = 4955926
+i=4: seed = (4955926 × 31 + 0x8B) >>> 0 = 153633699
+...  (continues for 8 bytes total)
+Final seed = some 32-bit integer determined entirely by the key</code></pre>
+
+<p>A different password → different PBKDF2 output → different key bytes → different seed → different Mulberry32 stream → completely different Fisher-Yates permutation → completely different pixel order. Without the correct key, extraction reads bits from wrong pixels — output is pure noise.</p>
+
+<h3 id="ch3-fy">3.4 Fisher-Yates Shuffle — Proof of Uniformity</h3>
+<pre><code><span class="kw">function</span> <span class="fn">generatePixelOrder</span>(totalPixels, keyBytes) {
+  <span class="kw">const</span> prng = <span class="fn">mulberry32</span>(<span class="fn">seedFromKey</span>(keyBytes));
+  <span class="kw">const</span> indices = <span class="kw">new</span> <span class="type">Uint32Array</span>(totalPixels);
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i < totalPixels; i++) indices[i] = i;
+
+  <span class="kw">for</span> (<span class="kw">let</span> i = totalPixels - <span class="num">1</span>; i > <span class="num">0</span>; i--) {
+    <span class="kw">const</span> j = Math.<span class="fn">floor</span>(prng() <span class="op">*</span> (i + <span class="num">1</span>));  <span class="cmt">// j ∈ [0, i] uniformly</span>
+    [indices[i], indices[j]] = [indices[j], indices[i]];  <span class="cmt">// swap</span>
+  }
+  <span class="kw">return</span> indices;
+}</code></pre>
+
+<h4>Why Fisher-Yates guarantees uniformity</h4>
+<p>At each step i (going from n-1 down to 1), element at position i is swapped with a uniformly random position in [0, i]. Let's trace a small example with 3 pixels [0,1,2]:</p>
+<pre><code>Initial: [0, 1, 2]
+
+Step i=2: j = random in [0,1,2] — say j=1
+  Swap indices[2] and indices[1]: [0, 2, 1]
+
+Step i=1: j = random in [0,1] — say j=0
+  Swap indices[1] and indices[0]: [2, 0, 1]
+
+Result permutation: pixel 2 visited first, then pixel 0, then pixel 1.
+
+All 6 possible permutations (3! = 6) have exactly 1/6 probability.
+This is the definition of a uniform random permutation.</code></pre>
+
+<div class="warn-box"><strong>The naive sort-shuffle is biased:</strong> <code>array.sort(() => Math.random() - 0.5)</code> is a common mistake. Sort algorithms assume a consistent ordering — when the comparator is random, different implementations give different probability distributions for the permutations. Some permutations become significantly more likely than others. This would make your pixel order non-uniform, creating a detectable statistical signature. Fisher-Yates is the mathematically correct algorithm.</div>
+
+<h3 id="ch3-embed">3.5 The Embed Package Format</h3>
+
+<div class="byte-layout">
+  <div class="byte-cell bc-len"><span class="label">Bytes 0–3</span><span class="val">Length (N)</span></div>
+  <div class="byte-cell bc-iv"><span class="label">Bytes 4–15</span><span class="val">IV (12 bytes)</span></div>
+  <div class="byte-cell bc-ct"><span class="label">Bytes 16 to 16+M-1</span><span class="val">Ciphertext (M bytes)</span></div>
+  <div class="byte-cell bc-tag"><span class="label">Last 16 bytes of ciphertext</span><span class="val">Auth Tag</span></div>
+</div>
+
+<p>Where <code>N = 12 + M</code> (IV length + ciphertext+tag length), and <code>M = original_message_bytes + 16</code>. The length field stores N (the entire payload after the 4-byte header), not the original message length. This allows extraction to know exactly how many bits to read from the pixel order without scanning for a delimiter.</p>
+
+<h4>The bit-writing loop — full conceptual walkthrough</h4>
+<span class="section-tag tag-code">stegoEngine.js: embedData() lines 139–154</span>
+<pre><code><span class="kw">for</span> (<span class="kw">let</span> bitPos = <span class="num">0</span>; bitPos < totalBits; bitPos++) {
+
+  <span class="cmt">// ━━━ Where to write ━━━</span>
+  <span class="cmt">// bitPosToPixelChannel maps the linear bit position to (pixel slot, channel).</span>
+  <span class="cmt">// 3 channels per pixel: bits 0,1,2 → pixel 0 R,G,B; bits 3,4,5 → pixel 1 R,G,B; ...</span>
+  <span class="kw">const</span> { pixelOrderIndex, channelIndex } = <span class="fn">bitPosToPixelChannel</span>(bitPos);
+  <span class="cmt">//  pixelOrderIndex = Math.floor(bitPos / 3)  e.g. bitPos=7 → pixel slot 2</span>
+  <span class="cmt">//  channelIndex    = bitPos % 3               e.g. bitPos=7 → channel 1 (Green)</span>
+
+  <span class="cmt">// ━━━ Which ACTUAL pixel ━━━</span>
+  <span class="cmt">// pixelOrder is the shuffled array. pixelOrder[2] might be 41823 —</span>
+  <span class="cmt">// meaning we write the 7th bit into pixel #41823's Green channel.</span>
+  <span class="kw">const</span> pixelIdx   = pixelOrder[pixelOrderIndex];  <span class="cmt">// key-dependent lookup</span>
+  <span class="kw">const</span> byteOffset = pixelIdx <span class="op">*</span> <span class="num">4</span>;                 <span class="cmt">// RGBA: 4 bytes per pixel</span>
+
+  <span class="cmt">// ━━━ What bit to write ━━━</span>
+  <span class="cmt">// The embed package bytes are emitted MSB-first (bit 7 of byte 0 first).</span>
+  <span class="kw">const</span> byteIndex = Math.<span class="fn">floor</span>(bitPos / <span class="num">8</span>);
+  <span class="kw">const</span> bitInByte = <span class="num">7</span> - (bitPos % <span class="num">8</span>);
+  <span class="cmt">// bitPos=0  → byteIndex=0, bitInByte=7  (MSB of first byte)
+  // bitPos=1  → byteIndex=0, bitInByte=6
+  // bitPos=7  → byteIndex=0, bitInByte=0  (LSB of first byte)
+  // bitPos=8  → byteIndex=1, bitInByte=7  (MSB of second byte)
+  </span>
+  <span class="kw">const</span> bit = (embedPackage[byteIndex] <span class="op">>></span> bitInByte) <span class="op">&</span> <span class="num">1</span>;
+  <span class="cmt">// Right-shift target bit to position 0, then AND with 1 to isolate it.
+  // Result is 0 or 1.</span>
+
+  <span class="cmt">// ━━━ Write the bit ━━━</span>
+  <span class="cmt">// 0xFE = 11111110: AND clears bit 0, leaves bits 1-7 untouched.
+  // | bit: sets bit 0 to the payload bit. Max colour change: ±1.</span>
+  newData[byteOffset + channelIndex] = (newData[byteOffset + channelIndex] <span class="op">&</span> <span class="num">0xfe</span>) <span class="op">|</span> bit;
+}</code></pre>
+
+<h3 id="ch3-extract">3.6 Extraction — Reading Back What Was Written</h3>
+<pre><code><span class="cmt">// ── Phase 1: Read the 4-byte (32-bit) length header ──</span>
+<span class="cmt">// Same pixel order as embedding (same key = same seed = same shuffle).</span>
+<span class="kw">const</span> lengthBytes = <span class="kw">new</span> <span class="type">Uint8Array</span>(<span class="num">4</span>);
+<span class="kw">for</span> (<span class="kw">let</span> bitPos = <span class="num">0</span>; bitPos < <span class="num">32</span>; bitPos++) {
+  <span class="kw">const</span> { pixelOrderIndex, channelIndex } = <span class="fn">bitPosToPixelChannel</span>(bitPos);
+  <span class="kw">const</span> pixelIdx   = pixelOrder[pixelOrderIndex];
+  <span class="kw">const</span> byteOffset = pixelIdx <span class="op">*</span> <span class="num">4</span>;
+  <span class="kw">const</span> bit        = data[byteOffset + channelIndex] <span class="op">&</span> <span class="num">1</span>;  <span class="cmt">// read LSB</span>
+  <span class="kw">const</span> byteIndex  = Math.<span class="fn">floor</span>(bitPos / <span class="num">8</span>);
+  <span class="kw">const</span> bitInByte  = <span class="num">7</span> - (bitPos % <span class="num">8</span>);
+  <span class="kw">if</span> (bit) lengthBytes[byteIndex] <span class="op">|=</span> (<span class="num">1</span> <span class="op">&lt;&lt;</span> bitInByte);  <span class="cmt">// set the bit in position</span>
+}
+
+<span class="kw">const</span> payloadLength = <span class="kw">new</span> <span class="type">DataView</span>(lengthBytes.buffer).<span class="fn">getUint32</span>(<span class="num">0</span>, <span class="kw">false</span>);
+<span class="cmt">// false = big-endian, matching how it was written during embed.
+// Result: the number of bytes of IV+ciphertext that were embedded.</span>
+
+<span class="cmt">// ── Sanity check ──</span>
+<span class="cmt">// If someone passes a non-stego image or uses the wrong key:</span>
+<span class="cmt">// - Wrong key → wrong pixel order → reads noise → random 32-bit number</span>
+<span class="cmt">// - A random 32-bit number is extremely unlikely to be in [28, maxCapacity]</span>
+<span class="cmt">// - 28 = minimum valid: 12 bytes IV + 16 bytes auth tag (empty message)</span>
+<span class="kw">if</span> (payloadLength < <span class="num">28</span> || payloadLength > maxPayload) {
+  <span class="kw">throw new</span> <span class="type">Error</span>(<span class="str">'No valid hidden data detected...'</span>);
+}
+
+<span class="cmt">// ── Phase 2: Read payload ──</span>
+<span class="cmt">// Start from bitPos=32 (right after the header).</span>
+<span class="cmt">// The '7 - (relBit % 8)' uses relBit = bitPos - 32 so byte indexing</span>
+<span class="cmt">// restarts at 0 for the payload array (not the full package).</span>
+
+<span class="cmt">// ── Phase 3: Split ──</span>
+<span class="kw">const</span> iv         = payload.<span class="fn">slice</span>(<span class="num">0</span>, <span class="num">12</span>);   <span class="cmt">// first 12 bytes = IV</span>
+<span class="kw">const</span> ciphertext = payload.<span class="fn">slice</span>(<span class="num">12</span>);      <span class="cmt">// rest = ciphertext + auth tag</span></code></pre>
+
+</div><!-- /container -->
+</body>
+</html>
