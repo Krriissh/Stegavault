@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Unlock, Search, Clock, Shield, ChevronRight } from 'lucide-react';
+import { Lock, Unlock, Search, Clock, Shield, ChevronRight, QrCode } from 'lucide-react';
 
 const NAV_ITEMS = [
   {
@@ -16,6 +16,13 @@ const NAV_ITEMS = [
     icon: Unlock,
     color: 'blue',
     description: 'Recover hidden data',
+  },
+  {
+    id: 'stegaqr',
+    label: 'StegaQR',
+    icon: QrCode,
+    color: 'purple',
+    description: 'QR steganography',
   },
   {
     id: 'detect',

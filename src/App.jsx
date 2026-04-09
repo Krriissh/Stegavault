@@ -6,10 +6,12 @@ import EncryptModule  from './modules/encrypt/EncryptModule.jsx';
 import DecryptModule  from './modules/decrypt/DecryptModule.jsx';
 import DetectModule   from './modules/detect/DetectModule.jsx';
 import HistoryModule  from './modules/history/HistoryModule.jsx';
+import StegaQRModule  from './modules/stegaqr/StegaQRModule.jsx';
 
 const MODULES = {
   encrypt: EncryptModule,
   decrypt: DecryptModule,
+  stegaqr: StegaQRModule,
   detect:  DetectModule,
   history: HistoryModule,
 };
